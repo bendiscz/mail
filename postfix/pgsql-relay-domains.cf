@@ -1,0 +1,10 @@
+# relay domains lookup query
+hosts = localhost
+user = mail_postfix
+password = ???
+
+dbname = mail
+
+query = SELECT DISTINCT r.domain
+	FROM mail.relays r
+	WHERE r.domain = '%s';

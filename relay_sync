@@ -1,0 +1,47 @@
+#!/usr/bin/perl -wtT
+
+use strict;
+
+use DBI;
+
+# connection params
+my $system_code = "sucker";
+
+my $db_remote_url = "DBI:Pg:host=snowhill.cz;dbname=mail;sslmode=require";
+my $db_remote_user = "mail_sync";
+my $db_remote_passwd = "???";
+
+my $db_local_url = "DBI:Pg:host=localhost;dbname=mail";
+my $db_local_user = "mail_relay";
+my $db_local_passwd = "???";
+
+# fetch new relay destinations
+my $dbh = DBI->connect($db_remote_url, $db_remote_user, $db_remote_passwd, { RaiseError => 1, AutoCommit => 1 });
+
+my $destinations_ref;
+if ($dbh->selectrow_array("SELECT mail.version_check('$system_code')")) {
+    $destinations_ref = $dbh->selectall_arrayref("SELECT name, domain FROM mail.destinations");
+}
+
+$dbh->disconnect();
+
+# check if an update is available
+exit unless defined($destinations_ref);
+
+# update the local relay table
+$dbh = DBI->connect($db_local_url, $db_local_user, $db_local_passwd, { RaiseError => 1, AutoCommit => 0 });
+
+eval {
+    my $sth = $dbh->prepare("INSERT INTO mail.relays VALUES (?,?)");
+    $dbh->do("DELETE FROM mail.relays");
+    foreach my $row (@$destinations_ref) {
+        $sth->execute(@$row[0], @$row[1]);
+    }
+    $dbh->commit();
+};
+if ($@) {
+    warn "Database error: $DBI::errstr\n";
+    $dbh->rollback();
+}
+
+$dbh->disconnect();

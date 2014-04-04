@@ -1,0 +1,11 @@
+# domain catchall lookup query
+hosts = localhost
+user = mail_postfix
+password = ???
+
+dbname = mail
+
+query = SELECT d.catchall
+	FROM mail.domains d
+	WHERE d.catchall IS NOT NULL
+	AND d.active AND d.name = '%d'

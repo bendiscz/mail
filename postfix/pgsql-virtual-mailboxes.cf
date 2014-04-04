@@ -1,0 +1,12 @@
+# mailboxes lookup query
+hosts = localhost
+user = mail_postfix
+password = ???
+
+dbname = mail
+
+query = SELECT u.name || '@' || d.name
+	FROM mail.users u, mail.domains d
+	WHERE u.domain_id = d.domain_id
+	AND u.active AND u.name = '%u'
+	AND d.active AND d.name = '%d'

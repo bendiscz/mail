@@ -1,0 +1,20 @@
+# aliases lookup query
+hosts = localhost
+user = mail_postfix
+password = ???
+
+dbname = mail
+
+# the firts query performs mail.aliases lookup
+# the second query is an identity user lookup (because of catchall map)
+query = SELECT a.target
+	FROM mail.aliases a, mail.domains d
+	WHERE a.domain_id = d.domain_id
+	AND d.active AND d.name ='%d'
+	AND a.source = '%u'
+	UNION
+	SELECT u.name || '@' || d.name
+	FROM mail.users u, mail.domains d
+	WHERE u.domain_id = d.domain_id
+	AND u.active AND u.name = '%u'
+	AND d.active AND d.name = '%d'

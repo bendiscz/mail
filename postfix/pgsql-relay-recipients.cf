@@ -1,0 +1,10 @@
+# relay recipients lookup query
+hosts = localhost
+user = mail_postfix
+password = ???
+
+dbname = mail
+
+query = SELECT true
+	FROM mail.relays r
+	WHERE (r.name || '@' || r.domain) = '%s'
