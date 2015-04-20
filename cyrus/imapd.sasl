@@ -26,4 +26,4 @@ sasl_sql_hostnames: localhost
 sasl_sql_user: mail_cyrus
 sasl_sql_passwd: ???
 sasl_sql_database: mail
-sasl_sql_select: SELECT decode(u.passwd, 'base64') FROM mail.users u, mail.domains d WHERE u.domain_id = d.domain_id AND u.active AND u.name = '%u' AND d.active AND d.name = '%r'
+sasl_sql_select: SELECT convert_from(decode(u.passwd, 'base64'), 'utf8') FROM mail.users u, mail.domains d WHERE u.domain_id = d.domain_id AND u.active AND u.name = '%u' AND d.active AND d.name = '%r'
