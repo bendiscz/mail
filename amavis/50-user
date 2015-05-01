@@ -1,0 +1,69 @@
+use strict;
+
+#
+# Place your configuration directives here.  They will override those in
+# earlier files.
+#
+# See /usr/share/doc/amavisd-new/ for documentation and examples of
+# the directives you can use in this file
+#
+
+# Ports
+$inet_socket_port = [10024, 10026];
+
+# Local network
+@mynetworks = qw( 127.0.0.0/8 [::1]/128 );
+
+# POSTFIX, or SENDMAIL in dual-MTA setup, or EXIM V4
+# (set host and port number as required; host can be specified
+# as an IP address or a DNS name (A or CNAME, but MX is ignored)
+$forward_method = 'smtp:[::1]:10025';  # where to forward checked mail
+$notify_method = $forward_method;            # where to submit notifications
+
+# Net::Server pre-forking settings
+# The $max_servers should match the width of your MTA pipe
+# feeding amavisd, e.g. with Postfix the 'Max procs' field in the
+# master.cf file, like the '2' in the:  smtp-amavis unix - - n - 2 smtp
+#
+$max_servers  =  2;      # number of pre-forked children          (default 2)
+$max_requests =  5;      # retire a child after that many accepts (default 10)
+
+$child_timeout= 5 * 60;  # abort child if it does not complete each task in
+                         # approximately n sec (default: 8*60 seconds)
+
+# Disable subject mangling
+$sa_spam_subject_tag = undef;
+$sa_tag_level_deflt  = undef;  # add spam info headers if at, or above that level
+$sa_tag2_level_deflt = 6.31;   # add 'spam detected' headers at that level
+$sa_kill_level_deflt = 6.31;   # triggers spam evasive actions
+$sa_dsn_cutoff_level = 10;     # spam level beyond which a DSN is not sent
+
+# SQL lookup database access
+@lookup_sql_dsn = (
+    ['DBI:Pg:dbname=mail;host=localhost', 'mail_amavis', '???'],
+);
+
+# SQL queries
+$sql_select_policy = 'SELECT u.user_id AS id, p.* FROM mail.domains d, mail.users u'.
+    ' LEFT OUTER JOIN mail.policies p ON (p.user_id = u.user_id)'.
+    ' WHERE d.active AND u.active'.
+    ' AND u.domain_id = d.domain_id'.
+    ' AND (u.name || \'@\' || d.name) IN (%k)';
+
+$sql_select_white_black_list = 'SELECT w.wb FROM mail.wblist w, mail.senders s'.
+    ' WHERE w.sender_id = s.sender_id'.
+    ' AND w.user_id = ?'.
+    ' AND s.email IN (%k)'.
+    ' ORDER BY s.priority DESC';
+
+# Trusted policy bank
+$policy_bank{'TRUSTED'} = {
+    bypass_spam_checks_maps   => [1],   # don't spam-check this mail
+    bypass_banned_checks_maps => [1],   # don't banned-check this mail
+    bypass_header_checks_maps => [1],   # don't header-check this mail
+};
+
+$interface_policy{'10026'} = 'TRUSTED';
+
+#------------ Do not modify anything below this line -------------
+1;  # ensure a defined return

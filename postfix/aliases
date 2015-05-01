@@ -1,0 +1,23 @@
+# Master root alias
+root:		admin@example.com
+
+# Required aliases
+mailer-daemon:	postmaster
+postmaster:	root
+
+# Common aliases
+nobody:		root
+hostmaster:	root
+usenet:		root
+news:		root
+webmaster:	root
+www:		root
+ftp:		root
+abuse:		root
+noc:		root
+security:	root
+spam:		root
+
+# Other aliases
+clamav:		root
+amavis:		root

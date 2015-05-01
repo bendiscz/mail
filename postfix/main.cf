@@ -1,0 +1,103 @@
+# Debian specific:  Specifying a file name will cause the first
+# line of that file to be used as the name.  The Debian default
+# is /etc/mailname.
+#myorigin = /etc/mailname
+
+smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
+biff = no
+
+# appending .domain is the MUA's job.
+append_dot_mydomain = no
+
+# Uncomment the next line to generate "delayed mail" warnings
+#delay_warning_time = 4h
+
+readme_directory = no
+
+# Basic parameters
+myhostname = vds1.snowhill.cz
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
+myorigin = /etc/mailname
+mydestination = server.example.com, localhost.example.com, localhost
+relayhost =
+mynetworks = 127.0.0.0/8, [::1]/128
+mailbox_command = procmail -a "$EXTENSION"
+mailbox_size_limit = 0
+recipient_delimiter = +
+inet_interfaces = all
+message_size_limit = 44040192
+
+# TLS parameters
+smtpd_tls_cert_file=/etc/ssl/mail/mail_example_com.crt
+smtpd_tls_key_file=/etc/ssl/mail/mail_example_com.key
+smtpd_use_tls=yes
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+
+# SASL parameters
+smtpd_sasl_auth_enable = yes
+smtpd_sasl_type = cyrus
+smtpd_sasl_security_options = noanonymous
+
+# Restrictions
+smtpd_delay_reject = yes
+
+# client restrictions
+smtpd_client_restrictions =
+    check_client_access hash:/etc/postfix/client_access,
+    permit_mynetworks,
+    permit_sasl_authenticated,
+    reject_rbl_client zen.spamhaus.org,
+    reject_rbl_client bl.spamcop.net,
+    permit
+
+# sender restrictions
+smtpd_sender_restrictions =
+    permit_mynetworks,
+    reject_non_fqdn_sender,
+    reject_unknown_sender_domain,
+    permit
+
+# recipient restrictions
+smtpd_recipient_restrictions =
+    permit_mynetworks,
+    permit_sasl_authenticated,
+    reject_unauth_destination,
+    check_policy_service inet:127.0.0.1:60000
+
+smtpd_recipient_restrictions =
+    reject_unauth_pipelining,
+    reject_non_fqdn_recipient,
+    reject_unknown_recipient_domain,
+    permit_mynetworks,
+    permit_sasl_authenticated,
+    reject_unauth_destination,
+    check_sender_access hash:/etc/postfix/sender_access,
+#    check_policy_service unix:postgrey/socket,
+    permit
+
+# DATA restrictions; enforce content filtering for untrusted clients
+smtpd_data_restrictions =
+    permit_sasl_authenticated,
+    check_client_access pcre:/etc/postfix/content_filter.re
+
+# DKIM
+milter_protocol = 2
+milter_default_action = accept
+
+smtpd_milters = inet:localhost:12301
+non_smtpd_milters = inet:localhost:12301
+
+# virtual mailboxes
+virtual_transport = lmtp:unix:/var/run/cyrus/socket/lmtp
+virtual_mailbox_domains = proxy:pgsql:/etc/postfix/pgsql-virtual-domains.cf
+virtual_mailbox_maps = proxy:pgsql:/etc/postfix/pgsql-virtual-mailboxes.cf
+virtual_alias_maps =
+    proxy:pgsql:/etc/postfix/pgsql-virtual-aliases.cf,
+    regexp:/etc/postfix/virtual-aliases-std.re,
+    proxy:pgsql:/etc/postfix/pgsql-virtual-catchalls.cf
+
+# backup MX relay
+relay_domains = proxy:pgsql:/etc/postfix/pgsql-relay-domains.cf
+relay_recipient_maps = proxy:pgsql:/etc/postfix/pgsql-relay-recipients.cf
