@@ -43,6 +43,7 @@ CREATE TABLE mail.policies (
 	
 	virus_lover			char(1)		default NULL,     -- Y/N
 	spam_lover			char(1)		default NULL,     -- Y/N
+	unchecked_lover			char(1)		default NULL,     -- Y/N
 	banned_files_lover		char(1)		default NULL,     -- Y/N
 	bad_header_lover		char(1)		default NULL,     -- Y/N
 
@@ -51,17 +52,21 @@ CREATE TABLE mail.policies (
 	bypass_banned_checks		char(1)		default NULL,     -- Y/N
 	bypass_header_checks		char(1)		default NULL,     -- Y/N
 
-	spam_modifies_subj		char(1)		default NULL,     -- Y/N
-
 	virus_quarantine_to		varchar(64)	default NULL,
 	spam_quarantine_to		varchar(64)	default NULL,
 	banned_quarantine_to		varchar(64)	default NULL,
+	unchecked_quarantine_to		varchar(64)	default NULL,
 	bad_header_quarantine_to	varchar(64)	default NULL,
+	clean_quarantine_to		varchar(64)	default NULL,
+	archive_quarantine_to		varchar(64)	default NULL,
 
-	spam_tag_level			float		default NULL, -- higher score inserts spam info headers
-	spam_tag2_level			float		default NULL, -- inserts 'declared spam' header fields
-	spam_kill_level			float		default NULL, -- higher score triggers evasive actions
-	spam_dsn_cutoff_level		float		default NULL,
+	spam_tag_level			real		default NULL, -- higher score inserts spam info headers
+	spam_tag2_level			real		default NULL, -- inserts 'declared spam' header fields
+	spam_tag3_level			real		default NULL, -- inserts 'blatant spam' header fields
+	spam_kill_level			real		default NULL, -- higher score triggers evasive actions
+
+	spam_dsn_cutoff_level		real		default NULL,
+	spam_quarantine_cutoff_level	real		default NULL,
 
 	addr_extension_virus		varchar(64)	default NULL,
 	addr_extension_spam		varchar(64)	default NULL,
@@ -78,9 +83,14 @@ CREATE TABLE mail.policies (
 	spam_admin			varchar(64)	default NULL,
 	spam_subject_tag		varchar(64)	default NULL,
 	spam_subject_tag2		varchar(64)	default NULL,
+	spam_subject_tag3		varchar(64)	default NULL,
 	message_size_limit		integer		default NULL, -- max size in bytes, 0 disable
 	banned_rulenames		varchar(64)	default NULL, -- comma-separated list of ...
 								      -- names mapped through %banned_rules to actual banned_filename tables
+	disclaimer_options		varchar(64)	default NULL,
+	forward_method			varchar(64)	default NULL,
+	sa_userconf			varchar(64)	default NULL,
+	sa_username			varchar(64)	default NULL,
 
 	user_id				integer		UNIQUE NOT NULL REFERENCES mail.users ON DELETE CASCADE
 );
@@ -173,6 +183,23 @@ BEGIN
 	 WHERE system = 'local';
 
 	RETURN NULL;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
+CREATE OR REPLACE FUNCTION mail.update_passwd(user_name text, domain_name text, new_passwd text) RETURNS void AS $$
+DECLARE
+    new_passwd_enc text;
+BEGIN
+    -- encode the password
+    SELECT encode(convert_to(new_passwd, 'utf8'), 'base64')
+      INTO new_passwd_enc;
+
+    -- change the password
+    UPDATE mail.users u
+       SET passwd = new_passwd_enc
+      FROM mail.domains d
+     WHERE u.domain_id = d.domain_id AND u.name = user_name AND d.name = domain_name;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 

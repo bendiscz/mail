@@ -1,3 +1,5 @@
 - Pridat clamav do skupiny amavis.
-- Vygenerovat systemova locale pro horde.
 - Nastavit chroot u lmtp na 'n' v /etc/postfix/master.conf.
+- Zapnout squatter events
+
+- Nezapomenout na SPF a DKIM
