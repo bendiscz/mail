@@ -61,12 +61,6 @@ smtpd_sender_restrictions =
 
 # recipient restrictions
 smtpd_recipient_restrictions =
-    permit_mynetworks,
-    permit_sasl_authenticated,
-    reject_unauth_destination,
-    check_policy_service inet:127.0.0.1:60000
-
-smtpd_recipient_restrictions =
     reject_unauth_pipelining,
     reject_non_fqdn_recipient,
     reject_unknown_recipient_domain,

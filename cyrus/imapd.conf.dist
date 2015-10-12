@@ -18,7 +18,7 @@ newsspool: /var/spool/news
 
 # Alternate namespace
 # If enabled, activate the alternate namespace as documented in
-# /usr/share/doc/cyrus-doc-2.4/html/altnamespace.html, where an user's
+# /usr/share/doc/cyrus-doc/html/altnamespace.html, where an user's
 # subfolders are in the same level as the INBOX
 # See also userprefix and sharedprefix on imapd.conf(5)
 altnamespace: no
@@ -47,8 +47,7 @@ unixhierarchysep: no
 # Forcing recipient user to lowercase
 # Cyrus IMAPD is case-sensitive.  If all your mail users are in lowercase, it is
 # probably a very good idea to set lmtp_downcase_rcpt to true.  This is set by 
-# default, per RFC2821. This was not set by default in debian versions up to
-# and including 2.2.12-4.
+# default, per RFC2821.
 lmtp_downcase_rcpt: yes
 
 # Uncomment the following and add the space-separated users who 
@@ -106,6 +105,13 @@ sieveusehomedir: false
 
 # If sieveusehomedir is false, this directory is searched for Sieve scripts.
 sievedir: /var/spool/sieve
+
+# Space-separated list of HTTP modules that will be enabled in
+# httpd(8).  This option has no effect on modules that are disabled at
+# compile time due to missing dependencies (e.g. libical).
+# 
+# Allowed values: caldav, carddav, domainkey, ischedule, rss
+httpmodules: caldav carddav
 
 # notifyd(8) method to use for "MAIL" notifications.  If not set, "MAIL"
 # notifications are disabled.  Valid methods are: null, log, zephyr
@@ -256,6 +262,12 @@ tls_session_timeout: 1440
 # attacks).  It also orders the list so that stronger ciphers come first.
 tls_cipher_list: TLSv1+HIGH:!aNULL:@STRENGTH
 
+# A list of SSL/TLS versions to not disable. Cyrus IMAP SSL/TLS starts
+# with all protocols, and substracts protocols not in this list. Newer
+# versions of SSL/TLS will need to be added here to allow them to get
+# disabled. */
+tls_versions: tls1_0 tls1_1 tls1_2
+
 # Require a client certificate for ALL services (imap, pop3, lmtp, sieve).
 #tls_require_cert: false
 
@@ -302,7 +314,7 @@ syslog_prefix: cyrus
 ##
 ## DEBUGGING
 ##
-# Debugging hook. See /usr/share/doc/cyrus-common-2.4/README.Debian.debug
+# Debugging hook. See /usr/share/doc/cyrus-common/README.Debian.debug
 # Keep the hook disabled when it is not in use
 #
 # gdb Back-traces
