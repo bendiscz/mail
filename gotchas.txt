@@ -1,4 +1,4 @@
-- Pridat clamav do skupiny amavis.
+- Pridat clamav do skupiny amavis a v clamd.conf dat AllowSupplementaryGroups true
 - Nastavit chroot u lmtp na 'n' v /etc/postfix/master.conf.
 - Zapnout squatter events
 

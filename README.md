@@ -7,7 +7,7 @@ Checklist
 ---------
 
 1. Install postgresql, clamav, clamav-daemon, amavisd-new, postfix, cyrus-imapd, cyrus-pop3d, cyrus-admin, opendkim, spamassassin
-2. Install libdbd-pg-perl, arj, cabextract, lzop, unrar, unrar-free, zoo, lhasa, nomarch, p7zip, pyzor, razor, postfix-pgsql, postfix-pcre
+2. Install libsasl2-modules-sql, libdbd-pg-perl, arj, cabextract, lzop, unrar, unrar-free, zoo, lhasa, nomarch, p7zip, pyzor, razor, postfix-pgsql, postfix-pcre
 3. Set up database schema (base + sa)
 4. Set up database users
 5. Copy and configure relay_sync
