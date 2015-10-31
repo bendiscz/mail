@@ -101,7 +101,7 @@ ifmail    unix  -       n       n       -       -       pipe
   flags=F user=ftn argv=/usr/lib/ifmail/ifmail -r $nexthop ($recipient)
 bsmtp     unix  -       n       n       -       -       pipe
   flags=Fq. user=bsmtp argv=/usr/lib/bsmtp/bsmtp -t$nexthop -f$sender $recipient
-scalemail-backend unix	-	n	n	-	2	pipe
+scalemail-backend unix  -       n       n       -       2       pipe
   flags=R user=scalemail argv=/usr/lib/scalemail/bin/scalemail-store ${nexthop} ${user} ${extension}
 mailman   unix  -       n       n       -       -       pipe
   flags=FR user=list argv=/usr/lib/mailman/bin/postfix-to-mailman.py
@@ -116,7 +116,7 @@ smtp-amavis unix -      -       -       -       2       smtp
     -o disable_dns_lookups=yes
     -o max_use=20
 
-[::1]:10025 inet n  -       -       -       -       smtpd
+[127.0.0.1]:10025 inet n  -       -       -       -       smtpd
     -o content_filter=
     -o local_recipient_maps=
     -o relay_recipient_maps=
@@ -134,4 +134,10 @@ smtp-amavis unix -      -       -       -       2       smtp
     -o smtpd_hard_error_limit=1000
     -o smtpd_client_connection_count_limit=0
     -o smtpd_client_connection_rate_limit=0
-    -o receive_override_options=no_header_body_checks,no_unknown_recipient_checks
+    -o receive_override_options=no_header_body_checks,no_unknown_recipient_checks,no_milters
+
+#
+# pypolicyd-spf
+#
+policy-spf  unix  -       n       n       -       -       spawn
+     user=nobody argv=/usr/bin/policyd-spf

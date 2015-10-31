@@ -17,7 +17,7 @@ $inet_socket_port = [10024, 10026];
 # POSTFIX, or SENDMAIL in dual-MTA setup, or EXIM V4
 # (set host and port number as required; host can be specified
 # as an IP address or a DNS name (A or CNAME, but MX is ignored)
-$forward_method = 'smtp:[::1]:10025';  # where to forward checked mail
+$forward_method = 'smtp:[127.0.0.1]:10025';  # where to forward checked mail
 $notify_method = $forward_method;            # where to submit notifications
 
 # Net::Server pre-forking settings

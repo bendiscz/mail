@@ -32,7 +32,7 @@ auto_whitelist_factory Mail::SpamAssassin::SQLBasedAddrList
 user_awl_dsn DBI:Pg:dbname=mail;host=localhost
 
 #   Some shortcircuiting, if the plugin is enabled
-# 
+#
 ifplugin Mail::SpamAssassin::Plugin::Shortcircuit
 #
 #   default: strongly-whitelisted mails are *really* whitelisted now, if the
@@ -61,3 +61,49 @@ ifplugin Mail::SpamAssassin::Plugin::Shortcircuit
 # shortcircuit BAYES_00                ham
 
 endif # Mail::SpamAssassin::Plugin::Shortcircuit
+
+# DMARC rules
+#
+header   DMARC_PASS Authentication-Results =~ /mail.example.com; dmarc=pass /
+describe DMARC_PASS DMARC validation seems valid
+tflags   DMARC_PASS nice
+score    DMARC_PASS -1.1
+
+header   DMARC_FAIL Authentication-Results =~ /mail.example.com; dmarc=fail /
+describe DMARC_FAIL DMARC validation failed
+score    DMARC_FAIL 3.7
+
+# ifplugin Mail::SpamAssassin::Plugin::AskDNS
+#
+# askdns __DMARC_POLICY_NONE   _dmarc._AUTHORDOMAIN_ TXT /^v\s*=DMARC1 (?=\s*;) .* ;\s* p\s*=\s*none       \s*(?:;|\z)/x
+# askdns __DMARC_POLICY_QUAR   _dmarc._AUTHORDOMAIN_ TXT /^v\s*=DMARC1 (?=\s*;) .* ;\s* p\s*=\s*quarantine \s*(?:;|\z)/x
+# askdns __DMARC_POLICY_REJECT _dmarc._AUTHORDOMAIN_ TXT /^v\s*=DMARC1 (?=\s*;) .* ;\s* p\s*=\s*reject     \s*(?:;|\z)/x
+#
+# meta     DMARC_FAIL_REJECT !(DKIM_VALID_AU || SPF_PASS) && __DMARC_POLICY_REJECT
+# describe DMARC_FAIL_REJECT DMARC validation failed and policy is to reject
+# score    DMARC_FAIL_REJECT 1.2
+#
+# meta     DMARC_FAIL_QUAR   !(DKIM_VALID_AU || SPF_PASS) && __DMARC_POLICY_QUAR
+# describe DMARC_FAIL_QUAR   DMARC validation failed and policy is quarantine
+# score    DMARC_FAIL_QUAR   0.8
+#
+# meta     DMARC_FAIL_NONE   !(DKIM_VALID_AU || SPF_PASS) && __DMARC_POLICY_NONE
+# describe DMARC_FAIL_NONE   DMARC validation failed and policy is none
+# score    DMARC_FAIL_NONE   0.1
+#
+# meta     DMARC_PASS_REJECT DKIM_VALID_AU && SPF_PASS && __DMARC_POLICY_REJECT
+# describe DMARC_PASS_REJECT DMARC validation passed and policy is to reject
+# tflags   DMARC_PASS_REJECT nice
+# score    DMARC_PASS_REJECT -1.8
+#
+# meta     DMARC_PASS_QUAR   DKIM_VALID_AU && SPF_PASS && __DMARC_POLICY_QUAR
+# describe DMARC_PASS_QUAR   DMARC validation passed and policy is quarantine
+# tflags   DMARC_PASS_QUAR   nice
+# score    DMARC_PASS_QUAR   -1.2
+#
+# meta     DMARC_PASS_NONE   DKIM_VALID_AU && SPF_PASS && __DMARC_POLICY_NONE
+# describe DMARC_PASS_NONE   DMARC validation passed and policy is none
+# tflags   DMARC_PASS_NONE   nice
+# score    DMARC_PASS_NONE   -0.8
+#
+# endif # Mail::SpamAssassin::Plugin::AskDNS
