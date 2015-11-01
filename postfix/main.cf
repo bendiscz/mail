@@ -11,6 +11,8 @@ readme_directory = no
 
 # Basic parameters
 myhostname = server.example.com
+mydomain = example.com
+myorigin = $mydomain
 alias_maps = hash:/etc/aliases
 alias_database = hash:/etc/aliases
 mydestination = server.example.com, localhost.example.com, localhost
