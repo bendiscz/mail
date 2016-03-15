@@ -88,7 +88,6 @@ virtual_mailbox_domains = proxy:pgsql:/etc/postfix/pgsql-virtual-domains.cf
 virtual_mailbox_maps = proxy:pgsql:/etc/postfix/pgsql-virtual-mailboxes.cf
 virtual_alias_maps =
     proxy:pgsql:/etc/postfix/pgsql-virtual-aliases.cf,
-    regexp:/etc/postfix/virtual-aliases-std.re,
     proxy:pgsql:/etc/postfix/pgsql-virtual-catchalls.cf
 
 # backup MX relay

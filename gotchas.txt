@@ -3,3 +3,5 @@
 - Zapnout squatter events
 
 - Nezapomenout na SPF a DKIM
+
+- Naplnit std_aliases

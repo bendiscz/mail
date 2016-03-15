@@ -21,9 +21,9 @@ CREATE TABLE mail.users (
 	name				varchar(127)	NOT NULL CHECK (char_length(name) > 0),
 	passwd				varchar(255)	NOT NULL,
 	active				boolean		NOT NULL default true,
-	
+
 	domain_id			integer		NOT NULL REFERENCES mail.domains,
-	
+
 	UNIQUE (name, domain_id)
 );
 
@@ -33,14 +33,22 @@ CREATE TABLE mail.aliases (
 
 	source				varchar(127)	NOT NULL CHECK (char_length(source) > 0),
 	target				varchar(255)	NOT NULL CHECK (char_length(target) > 0),
-	
+
+	domain_id			integer		NOT NULL REFERENCES mail.domains
+);
+
+CREATE TABLE mail.std_aliases (
+	std_alias_id			SERIAL		PRIMARY KEY,
+
+	source				varchar(127)	UNIQUE NOT NULL CHECK (char_length(source) > 0),
+
 	domain_id			integer		NOT NULL REFERENCES mail.domains
 );
 
 
 CREATE TABLE mail.policies (
 	policy_id			SERIAL		PRIMARY KEY,
-	
+
 	virus_lover			char(1)		default NULL,     -- Y/N
 	spam_lover			char(1)		default NULL,     -- Y/N
 	unchecked_lover			char(1)		default NULL,     -- Y/N
@@ -109,7 +117,7 @@ CREATE TABLE mail.wblist (
 	sender_id			integer		NOT NULL REFERENCES mail.senders, -- sender
 
 	wb				varchar(10)	NOT NULL,  -- W or Y / B or N / space=neutral / score
-	
+
 	PRIMARY KEY (user_id, sender_id)
 );
 

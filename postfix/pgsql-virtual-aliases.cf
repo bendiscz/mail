@@ -18,3 +18,9 @@ query = SELECT a.target
 	WHERE u.domain_id = d.domain_id
 	AND u.active AND u.name = '%u'
 	AND d.active AND d.name = '%d'
+	UNION
+	SELECT s.source || '@' || t.name
+	FROM mail.std_aliases s, mail.domains d, mail.domains t
+	WHERE d.active AND d.name = '%d'
+	AND d.domain_id != s.domain_id AND s.source = '%u'
+	AND t.domain_id = s.domain_id
